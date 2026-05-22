@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import Header from "../components/Header";
 
-const Layout = ({ children }) => {
+const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [currentPage, setCurrentPage] = useState("Dashboard");
@@ -84,4 +84,4 @@ const Layout = ({ children }) => {
   );
 };
 
-export default Layout;
+export default AdminLayout;

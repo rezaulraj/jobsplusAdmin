@@ -142,22 +142,14 @@ const SideBar = ({ isOpen, isMobile, onToggle }) => {
 
   return (
     <div className="h-full flex flex-col bg-white border-r border-slate-200 shadow-sm">
-      {/* Sidebar top green accent bar */}
-      <div className="h-1 w-full bg-gradient-to-r from-[#1e2558] to-[#4eb956] flex-shrink-0" />
-
-      {/* Logo */}
+      <div className="h-1 w-full bg-gradient-to-r from-[#1e2558] to-[#4eb956] shrink-0" />
       <div
-        className={`flex items-center ${isOpen ? "justify-between" : "justify-center"} px-3.5 py-3.5 border-b border-slate-100 flex-shrink-0`}
+        className={`flex items-center ${isOpen ? "justify-between" : "justify-center"} px-3.5 py-3.5 border-b border-slate-100 shrink-0`}
       >
         {isOpen && (
           <div className="flex items-center gap-2.5">
-            <div>
-              <div className="font-extrabold text-[18px] text-[#1e2558] tracking-tight leading-tight">
-                Jobs<span className="text-[#4eb956]">Plus</span>
-              </div>
-              <div className="text-[12px] font-bold text-[#4eb956] tracking-widest leading-tight">
-                ADMIN PORTAL
-              </div>
+            <div className="text-[16px] font-bold text-[#4eb956] text-clip tracking-widest leading-tight">
+              ADMIN PORTAL
             </div>
           </div>
         )}
