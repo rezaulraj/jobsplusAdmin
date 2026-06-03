@@ -7,10 +7,35 @@ import {
   HiChevronDown,
   HiBell,
   HiSearch,
+  HiShieldCheck,
 } from "react-icons/hi";
 import logo from "/logo.png";
+import useAuthStore from "../store/authStore";
 
+// ── tiny helpers ─────────────────────────────────────────────────────────────
+const getInitials = (name = "") =>
+  name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+const roleLabel = (role = "") => role.charAt(0).toUpperCase() + role.slice(1);
+
+const formatDate = (iso) => {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+// ── component ─────────────────────────────────────────────────────────────────
 const Header = ({ onToggleSidebar, currentPage }) => {
+  const { user, logout } = useAuthStore();
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -56,6 +81,7 @@ const Header = ({ onToggleSidebar, currentPage }) => {
   ];
   const unread = notifications.filter((n) => n.unread).length;
 
+  // close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target))
@@ -67,24 +93,29 @@ const Header = ({ onToggleSidebar, currentPage }) => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // derived display values
+  const displayName = user?.fullName || "Admin";
+  const displayRole = user?.role || "admin";
+  const initials = getInitials(displayName);
+  const isVerified = user?.isEmailVerified;
+
   return (
     <>
       <style>{`
         @keyframes dropIn {
           from { opacity:0; transform:translateY(-8px) scale(0.97); }
-          to   { opacity:1; transform:translateY(0) scale(1); }
+          to   { opacity:1; transform:translateY(0)   scale(1);    }
         }
         .drop-anim { animation: dropIn 0.18s cubic-bezier(0.4,0,0.2,1) forwards; }
       `}</style>
 
       <header className="bg-white border-b border-slate-200 shadow-sm relative z-40 flex-shrink-0">
-        {/* Top gradient bar */}
+        {/* gradient bar */}
         <div className="h-[3px] w-full bg-gradient-to-r from-[#1e2558] to-[#4eb956]" />
 
         <div className="flex items-center justify-between h-[60px] px-5">
-          {/* ── Left ── */}
+          {/* ── Left ──── */}
           <div className="flex items-center gap-3">
-            {/* Hamburger */}
             <button
               onClick={onToggleSidebar}
               className="p-2 rounded-lg border border-slate-200 text-[#1e2558] hover:bg-[#4eb956]/10 hover:border-[#4eb956]/30 hover:text-[#4eb956] transition-all duration-150"
@@ -92,39 +123,31 @@ const Header = ({ onToggleSidebar, currentPage }) => {
               <HiMenu className="text-xl" />
             </button>
 
-            {/* Logo pill */}
             <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
-              <div className="w-auto h-auto rounded-lg flex items-center justify-center flex-shrink-0">
-                <img src={logo} alt="Logo" className="w-auto h-4" />
-              </div>
+              <img src={logo} alt="Logo" className="w-auto h-4" />
             </div>
 
-            {/* Breadcrumb */}
             <div className="hidden md:flex items-center gap-2">
-              <span className="text-xs text-slate-400 font-medium">Admin</span>
-              <span className="text-[#4eb956] font-bold text-sm">›</span>
+    
               <span className="text-sm font-bold text-[#1e2558]">
                 {currentPage}
               </span>
             </div>
           </div>
 
-          {/* ── Right ── */}
+          {/* ── Right ─── */}
           <div className="flex items-center gap-2">
             {/* Search */}
             <div
-              className={`
-              hidden md:flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all duration-200
-              ${
-                searchFocused
-                  ? "bg-white border-[#1e2558] shadow-sm w-52"
-                  : "bg-slate-50 border-slate-200 w-36"
-              }
-            `}
+              className={`hidden md:flex items-center gap-2 px-3.5 py-2 rounded-xl border transition-all duration-200
+                ${
+                  searchFocused
+                    ? "bg-white border-[#1e2558] shadow-sm w-52"
+                    : "bg-slate-50 border-slate-200 w-36"
+                }`}
             >
               <HiSearch
-                className={`text-base flex-shrink-0 transition-colors duration-200
-                ${searchFocused ? "text-[#1e2558]" : "text-slate-400"}`}
+                className={`text-base flex-shrink-0 transition-colors duration-200 ${searchFocused ? "text-[#1e2558]" : "text-slate-400"}`}
               />
               <input
                 placeholder="Search..."
@@ -151,7 +174,6 @@ const Header = ({ onToggleSidebar, currentPage }) => {
 
               {isNotifOpen && (
                 <div className="drop-anim absolute right-0 top-[calc(100%+8px)] w-[308px] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
-                  {/* Header */}
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                     <span className="text-sm font-bold text-[#1e2558]">
                       Notifications
@@ -160,7 +182,6 @@ const Header = ({ onToggleSidebar, currentPage }) => {
                       {unread} New
                     </span>
                   </div>
-                  {/* List */}
                   <div className="max-h-72 overflow-y-auto">
                     {notifications.map((n) => (
                       <div
@@ -173,8 +194,7 @@ const Header = ({ onToggleSidebar, currentPage }) => {
                         </span>
                         <div className="flex-1 min-w-0">
                           <p
-                            className={`text-[13px] leading-snug truncate
-                            ${n.unread ? "text-[#1e2558] font-semibold" : "text-slate-500 font-normal"}`}
+                            className={`text-[13px] leading-snug truncate ${n.unread ? "text-[#1e2558] font-semibold" : "text-slate-500 font-normal"}`}
                           >
                             {n.text}
                           </p>
@@ -188,7 +208,6 @@ const Header = ({ onToggleSidebar, currentPage }) => {
                       </div>
                     ))}
                   </div>
-                  {/* Footer */}
                   <div className="px-4 py-2.5 border-t border-slate-100 text-center">
                     <button className="text-[13px] font-bold text-[#1e2558] hover:text-[#4eb956] transition-colors duration-150">
                       View all notifications →
@@ -207,38 +226,78 @@ const Header = ({ onToggleSidebar, currentPage }) => {
                 }}
                 className="flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 hover:bg-[#4eb956]/10 hover:border-[#4eb956]/30 transition-all duration-150"
               >
+                {/* Avatar: initials circle */}
                 <div className="w-8 h-8 rounded-full bg-[#1e2558] flex items-center justify-center flex-shrink-0">
-                  <HiUser className="text-[#4eb956] text-base" />
+                  <span className="text-[#4eb956] text-[11px] font-extrabold tracking-wide">
+                    {initials}
+                  </span>
                 </div>
+
                 <div className="hidden md:block text-left">
-                  <div className="text-[13px] font-bold text-[#1e2558] leading-tight">
-                    John Doe
+                  <div className="text-[13px] font-bold text-[#1e2558] leading-tight max-w-[110px] truncate">
+                    {displayName}
                   </div>
-                  <div className="text-[10px] font-bold text-[#4eb956] leading-tight">
-                    Admin
+                  <div className="text-[10px] font-bold text-[#4eb956] leading-tight capitalize">
+                    {displayRole}
                   </div>
                 </div>
+
                 <HiChevronDown
-                  className={`hidden md:block text-slate-400 text-sm transition-transform duration-200
-                  ${isProfileOpen ? "rotate-180" : "rotate-0"}`}
+                  className={`hidden md:block text-slate-400 text-sm transition-transform duration-200 ${isProfileOpen ? "rotate-180" : "rotate-0"}`}
                 />
               </button>
 
               {isProfileOpen && (
-                <div className="drop-anim absolute right-0 top-[calc(100%+8px)] w-48 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
-                  {/* Avatar */}
-                  <div className="px-4 py-4 border-b border-slate-100 text-center">
-                    <div className="w-12 h-12 rounded-full bg-[#1e2558] flex items-center justify-center mx-auto mb-2 shadow-md">
-                      <HiUser className="text-[#4eb956] text-xl" />
+                <div className="drop-anim absolute right-0 top-[calc(100%+8px)] w-60 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
+                  {/* ── User card ── */}
+                  <div className="px-4 py-4 border-b border-slate-100">
+                    {/* Avatar large */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-[#1e2558] flex items-center justify-center flex-shrink-0 shadow-md">
+                        <span className="text-[#4eb956] text-base font-extrabold tracking-wide">
+                          {initials}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-[#1e2558] truncate">
+                          {displayName}
+                        </div>
+                        <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                          <span className="text-[10px] font-bold text-[#4eb956] bg-[#4eb956]/10 border border-[#4eb956]/20 px-2 py-0.5 rounded-full capitalize">
+                            {roleLabel(displayRole)}
+                          </span>
+                          {isVerified && (
+                            <span className="flex items-center gap-0.5 text-[10px] font-bold text-blue-500 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                              <HiShieldCheck className="text-xs" />
+                              Verified
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm font-bold text-[#1e2558]">
-                      John Doe
+
+                    {/* Meta info */}
+                    <div className="mt-3 space-y-1.5 bg-slate-50 rounded-xl p-3">
+                      <InfoRow label="Email" value={user?.email || "—"} />
+                      <InfoRow label="Phone" value={user?.phone || "—"} />
+                      <InfoRow
+                        label="Joined"
+                        value={formatDate(user?.createdAt)}
+                      />
+                      <InfoRow
+                        label="Status"
+                        value={
+                          <span
+                            className={`font-semibold capitalize ${user?.isActive === "active" ? "text-[#4eb956]" : "text-red-500"}`}
+                          >
+                            {user?.isActive || "—"}
+                          </span>
+                        }
+                      />
                     </div>
-                    <span className="inline-block mt-1 text-[10px] font-bold text-[#4eb956] bg-[#4eb956]/10 border border-[#4eb956]/20 px-2.5 py-0.5 rounded-full">
-                      Administrator
-                    </span>
                   </div>
-                  {/* Menu */}
+
+                  {/* ── Menu ── */}
                   <div className="p-1.5">
                     {[
                       { icon: <HiUser />, label: "My Profile" },
@@ -255,7 +314,10 @@ const Header = ({ onToggleSidebar, currentPage }) => {
                       </button>
                     ))}
                     <div className="h-px bg-slate-100 my-1" />
-                    <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-150">
+                    <button
+                      onClick={() => logout()}
+                      className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-150"
+                    >
                       <HiLogout className="text-base" />
                       Sign Out
                     </button>
@@ -276,5 +338,17 @@ const Header = ({ onToggleSidebar, currentPage }) => {
     </>
   );
 };
+
+// ── tiny sub-component for info rows ─────────────────────────────────────────
+const InfoRow = ({ label, value }) => (
+  <div className="flex items-start justify-between gap-2">
+    <span className="text-[11px] text-slate-400 font-medium flex-shrink-0">
+      {label}
+    </span>
+    <span className="text-[11px] text-[#1e2558] font-semibold text-right truncate max-w-[130px]">
+      {value}
+    </span>
+  </div>
+);
 
 export default Header;

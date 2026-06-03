@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import SideBar from "../components/SideBar";
 import Header from "../components/Header";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [currentPage, setCurrentPage] = useState("Dashboard");
@@ -23,10 +23,10 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const pathToTitle = {
       "/admin/dashboard": "Dashboard",
-      "/admin/home": "Home",
-      "/admin/users": "Users",
-      "/saller/my-customer": "My Customers",
-      "/saller/add-customer": "Add Customer",
+      "/admin/all-jobs": "All Jobs",
+      "/admin/add-new-job": "Post Job",
+      "/admin/job-categories": "Job Categories",
+      "/admin/country-setup": "Country Setup",
       "/admin/profiles": "Profile Setup",
       "/admin/all-customer": "All Customers",
       "/saller/quotation": "Quotation",
@@ -77,7 +77,7 @@ const AdminLayout = ({ children }) => {
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header onToggleSidebar={toggleSidebar} currentPage={currentPage} />
         <main className="flex-1 overflow-auto bg-slate-100 p-6">
-          {children}
+           <Outlet />
         </main>
       </div>
     </div>

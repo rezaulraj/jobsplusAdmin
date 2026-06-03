@@ -14,6 +14,8 @@ import ForgotPassword from "./components/ForgotPassword";
 import GoogleCallback from "./components/GoogleCallback";
 import AdminLayout from "./layout/AdminLayout";
 import useAuthStore from "./store/authStore";
+import JobCategorys from "./pages/category/JobCategorys";
+import JobPost from "./pages/jobs/JobPost";
 
 function App() {
   const { isAuthenticated, tokens, setAuthHeader, user } = useAuthStore();
@@ -130,14 +132,8 @@ function App() {
               path="/admin/all-jobs"
               element={<div className="p-6">All Jobs</div>}
             />
-            <Route
-              path="/admin/add-new-job"
-              element={<div className="p-6">Post Job</div>}
-            />
-            <Route
-              path="/admin/job-categories"
-              element={<div className="p-6">Job Categories</div>}
-            />
+            <Route path="/admin/add-new-job" element={<JobPost />} />
+            <Route path="/admin/job-categories" element={<JobCategorys />} />
             <Route
               path="/admin/country-setup"
               element={<div className="p-6">Country Setup</div>}

@@ -120,7 +120,6 @@ const AdminAuth = () => {
       toast.error("Please enter a valid email address");
       return;
     }
-
     if (!formData.password) {
       toast.error("Please enter a password");
       return;

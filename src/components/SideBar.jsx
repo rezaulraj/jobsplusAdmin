@@ -40,7 +40,7 @@ const SideBar = ({ isOpen, isMobile, onToggle }) => {
         { id: 43, label: "Job Categories", path: "/admin/job-categories" },
         { id: 44, label: "Country Setup", path: "/admin/country-setup" },
         { id: 45, label: "City Setup", path: "/admin/city-setup" },
-        { id: 46, label: "Area Setup", path: "/admin/area-setup" },
+        // { id: 46, label: "Area Setup", path: "/admin/area-setup" },
         { id: 47, label: "Job Type Setup", path: "/admin/job-type-setup" },
       ],
     },
